@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import Link from 'next/link';
-import { FiMenu, FiBell, FiMail, FiUser, FiLogOut } from 'react-icons/fi';
+import { FiMenu, FiBell, FiMail, FiUser, FiLogOut, FiSearch } from 'react-icons/fi';
 
-export default function Header({ toggleSidebar }) {
+export default function Header({ toggleSidebar, title = "Dashboard" }) {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
 
@@ -17,31 +17,48 @@ export default function Header({ toggleSidebar }) {
   };
 
   return (
-    <header className="sticky top-0 z-10 flex-shrink-0 flex h-16 bg-white shadow">
+    <header className="sticky top-0 z-10 flex-shrink-0 flex h-16 bg-gray-50 shadow-sm">
       <button
         type="button"
-        className="px-4 border-r border-gray-200 text-gray-500 focus:outline-none focus:bg-gray-100 focus:text-gray-600 md:hidden"
+        className="px-4 text-gray-500 focus:outline-none focus:text-gray-600 md:hidden"
         onClick={toggleSidebar}
       >
         <FiMenu className="h-6 w-6" />
       </button>
       
-      <div className="flex-1 px-4 flex justify-between">
+      <div className="flex-1 px-4 flex justify-between items-center">
         <div className="flex-1 flex items-center">
-          {/* Logo - visible on mobile when sidebar is hidden */}
-          <div className="md:hidden flex items-center">
-            <Link href="/admin/dashboard" className="flex items-center">
-              <span className="text-xl font-bold text-blue-600">EduSync</span>
-            </Link>
+          {/* Welcome message */}
+          <h1 className="text-xl font-semibold text-gray-800">Welcome, Admin!</h1>
+          
+          {/* Search bar */}
+          <div className="hidden ml-10 md:block max-w-md w-full">
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FiSearch className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                type="text"
+                placeholder="Search..."
+                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              />
+            </div>
           </div>
         </div>
         
-        <div className="ml-4 flex items-center md:ml-6">
+        <div className="ml-4 flex items-center">
+          {/* Quick Actions Dropdown */}
+          <div className="mr-3">
+            <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors duration-150">
+              Quick Action
+            </button>
+          </div>
+          
           {/* Notifications */}
           <div className="ml-3 relative">
             <button
               type="button"
-              className="p-2 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:bg-gray-100 focus:text-gray-500"
+              className="p-2 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none"
               onClick={toggleNotifications}
             >
               <FiBell className="h-6 w-6" />
@@ -49,7 +66,7 @@ export default function Header({ toggleSidebar }) {
             </button>
             
             {notificationsOpen && (
-              <div className="origin-top-right absolute right-0 mt-2 w-80 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+              <div className="origin-top-right absolute right-0 mt-2 w-80 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50">
                 <div className="py-1" role="menu" aria-orientation="vertical">
                   <div className="px-4 py-2 text-sm text-gray-700 border-b">
                     <div className="font-bold">Notifications</div>
@@ -111,7 +128,7 @@ export default function Header({ toggleSidebar }) {
             </div>
             
             {profileOpen && (
-              <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+              <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50">
                 <div className="py-1" role="menu" aria-orientation="vertical">
                   <div className="px-4 py-2 text-sm text-gray-700 border-b">
                     <p className="font-bold">Admin User</p>

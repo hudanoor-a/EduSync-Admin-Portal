@@ -11,7 +11,7 @@ export default function Layout({ children, title = 'EduSync Admin' }) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-50">
       <Head>
         <title>{title}</title>
         <meta name="description" content="EduSync Education Management System" />
@@ -24,15 +24,10 @@ export default function Layout({ children, title = 'EduSync Admin' }) {
 
         {/* Main Content */}
         <div className="flex flex-col flex-1 w-0 overflow-hidden">
-          <Header toggleSidebar={toggleSidebar} />
+          <Header toggleSidebar={toggleSidebar} title={title} />
 
           <main className="relative flex-1 overflow-y-auto focus:outline-none p-6">
-            {/* Page Title */}
-            <div className="mb-6">
-              <h1 className="text-2xl font-semibold text-gray-900">{title}</h1>
-            </div>
-
-            {/* Page Content */}
+            {/* Page Content - removed separate title as it's now in header */}
             {children}
           </main>
         </div>
