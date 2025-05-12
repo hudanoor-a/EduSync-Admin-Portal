@@ -25,11 +25,6 @@ globalThis.__BUILD_MANIFEST = {
       "static/chunks/main.js",
       "static/chunks/pages/_error.js"
     ],
-    "/admin/analytics": [
-      "static/chunks/webpack.js",
-      "static/chunks/main.js",
-      "static/chunks/pages/admin/analytics.js"
-    ],
     "/admin/dashboard": [
       "static/chunks/webpack.js",
       "static/chunks/main.js",
