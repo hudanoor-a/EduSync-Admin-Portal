@@ -51,21 +51,21 @@ export default function FilterBar({
     <div className={`bg-white p-4 rounded-lg shadow mb-6 ${className}`}>
       <div className="flex flex-wrap items-center gap-4">
         {filters.map(filter => (
-          <div key={filter.name} className="flex-grow sm:flex-grow-0">
-            <label htmlFor={filter.name} className="block text-sm font-medium text-gray-700 mb-1">
+          <div key={filter.key} className="flex-grow sm:flex-grow-0">
+            <label htmlFor={filter.key} className="block text-sm font-medium text-gray-700 mb-1">
               {filter.label}
             </label>
             
             {filter.type === 'select' ? (
               <select
-                id={filter.name}
-                name={filter.name}
-                value={selectedFilters[filter.name] || ''}
-                onChange={(e) => handleFilterChange(filter.name, e.target.value)}
+                id={filter.key}
+                name={filter.key}
+                value={selectedFilters[filter.key] || ''}
+                onChange={(e) => handleFilterChange(filter.key, e.target.value)}
                 className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
               >
                 <option value="">{filter.placeholder || 'All'}</option>
-                {filter.options.map(option => (
+                {filter.options && filter.options.map(option => (
                   <option key={option.value} value={option.value}>
                     {option.label}
                   </option>
@@ -74,20 +74,20 @@ export default function FilterBar({
             ) : filter.type === 'date' ? (
               <input
                 type="date"
-                id={filter.name}
-                name={filter.name}
-                value={selectedFilters[filter.name] || ''}
-                onChange={(e) => handleFilterChange(filter.name, e.target.value)}
+                id={filter.key}
+                name={filter.key}
+                value={selectedFilters[filter.key] || ''}
+                onChange={(e) => handleFilterChange(filter.key, e.target.value)}
                 className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
               />
             ) : (
               <input
                 type="text"
-                id={filter.name}
-                name={filter.name}
+                id={filter.key}
+                name={filter.key}
                 placeholder={filter.placeholder}
-                value={selectedFilters[filter.name] || ''}
-                onChange={(e) => handleFilterChange(filter.name, e.target.value)}
+                value={selectedFilters[filter.key] || ''}
+                onChange={(e) => handleFilterChange(filter.key, e.target.value)}
                 className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
               />
             )}
