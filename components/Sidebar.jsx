@@ -5,6 +5,7 @@ import {
   FiClock, FiFileText, FiMail, FiBarChart2, FiLogOut 
 } from 'react-icons/fi';
 
+
 export default function Sidebar({ isOpen, toggleSidebar }) {
   const router = useRouter();
   

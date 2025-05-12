@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 export default function FilterBar({ 
   filters = [],
@@ -11,75 +11,46 @@ export default function FilterBar({
   const [selectedFilters, setSelectedFilters] = useState(activeFilters);
   const [isInitialized, setIsInitialized] = useState(false);
 
-  // Initialize selected filters
+  // Initialize selected filters (runs once on mount)
   useEffect(() => {
     const initialFilters = {...activeFilters};
     filters.forEach(filter => {
-      // Only set if not already in activeFilters
       if (!(filter.key in initialFilters)) {
         initialFilters[filter.key] = filter.defaultValue || '';
       }
     });
     setSelectedFilters(initialFilters);
     setIsInitialized(true);
-  }, [filters, activeFilters]);
+  }, [filters]); // Removed activeFilters from dependencies
 
-  // Handle dependencies for filters (like class depends on department)
-  useEffect(() => {
-    if (!isInitialized || !dependencies || Object.keys(dependencies).length === 0) return;
-    
-    // Check if any dependencies have changed and reset dependent filters
-    let hasChanges = false;
-    const newFilters = {...selectedFilters};
-    
-    Object.entries(dependencies).forEach(([dependentKey, dependsOn]) => {
-      // If the filter it depends on was changed
-      if (dependsOn.some(dep => dep in activeFilters)) {
-        // Reset the dependent filter
-        newFilters[dependentKey] = '';
-        hasChanges = true;
-      }
-    });
-    
-    if (hasChanges) {
-      setSelectedFilters(newFilters);
+  // Memoized filter change handler
+  const handleFilterChange = useCallback((filterKey, value) => {
+    setSelectedFilters(prevFilters => {
+      // Find dependent filters
+      const dependentFilters = dependencies 
+        ? Object.entries(dependencies)
+            .filter(([_, deps]) => deps.includes(filterKey))
+            .map(([key]) => key)
+        : [];
+
+      // Create new filters with reset dependent fields
+      const newFilters = {
+        ...prevFilters,
+        [filterKey]: value,
+        ...Object.fromEntries(dependentFilters.map(key => [key, '']))
+      };
+
+      // Notify parent component
       if (onFilterChange) {
         onFilterChange(newFilters);
       }
-    }
-  }, [dependencies, activeFilters, isInitialized, selectedFilters]);
 
-  // Handle filter change
-  const handleFilterChange = (filterKey, value) => {
-    // Find any filters that depend on this one
-    const dependentFilters = [];
-    if (dependencies) {
-      Object.entries(dependencies).forEach(([key, deps]) => {
-        if (deps.includes(filterKey)) {
-          dependentFilters.push(key);
-        }
-      });
-    }
-    
-    // Create new filters object with this change and reset dependent filters
-    const newFilters = {
-      ...selectedFilters,
-      [filterKey]: value
-    };
-    
-    // Reset dependent filters
-    dependentFilters.forEach(depKey => {
-      newFilters[depKey] = '';
+      return newFilters;
     });
-    
-    setSelectedFilters(newFilters);
-    if (onFilterChange) {
-      onFilterChange(newFilters);
-    }
-  };
+  }, [dependencies, onFilterChange]);
 
   // Reset all filters
-  const resetFilters = () => {
+  const resetFilters = useCallback(() => {
     const resetValues = {};
     filters.forEach(filter => {
       resetValues[filter.key] = filter.defaultValue || '';
@@ -88,7 +59,7 @@ export default function FilterBar({
     if (onFilterChange) {
       onFilterChange(resetValues);
     }
-  };
+  }, [filters, onFilterChange]);
 
   // If no filters, don't render anything
   if (!filters.length) return null;
@@ -103,11 +74,9 @@ export default function FilterBar({
       ) : (
         <div className="flex flex-wrap items-end gap-4">
           {filters.map(filter => {
-            // Determine if this filter should be disabled based on dependencies
             const isDisabled = filter.dependsOn && 
               (!selectedFilters[filter.dependsOn] || selectedFilters[filter.dependsOn] === '');
             
-            // Get filter options based on dependencies
             let options = filter.options || [];
             if (filter.getOptionsFrom && typeof filter.getOptionsFrom === 'function') {
               options = filter.getOptionsFrom(selectedFilters) || [];

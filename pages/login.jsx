@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { FiUser, FiLock, FiLogIn } from 'react-icons/fi';
+import '@/styles/globals.css';
+
 
 export default function Login() {
   const router = useRouter();

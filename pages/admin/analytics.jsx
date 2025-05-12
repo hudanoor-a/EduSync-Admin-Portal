@@ -23,32 +23,43 @@ export default function Analytics() {
     datasets: []
   });
   const [attendanceData, setAttendanceData] = useState({
-    student: { overall: {}, departmentWise: {} },
-    faculty: { overall: {}, departmentWise: {} }
+    student: { 
+      overall: { labels: [], present: [], absent: [], late: [] },
+      departmentWise: { labels: [], present: [], absent: [], late: [] }
+    },
+    faculty: { 
+      overall: { labels: [], present: [], absent: [], late: [] },
+      departmentWise: { labels: [], present: [], absent: [], late: [] }
+    }
   });
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('students'); // 'students' or 'faculty'
+  const [activeTab, setActiveTab] = useState('students');
 
   useEffect(() => {
     const fetchAnalyticsData = async () => {
       try {
         setLoading(true);
         
-        // Fetch department distribution data
         const departmentData = await getDepartmentDistribution();
         setDepartmentDistribution(departmentData);
         
-        // Fetch faculty performance data
         const facultyData = await getFacultyPerformance();
         setFacultyPerformance(facultyData);
         
-        // Fetch revenue data
         const revenueDataResponse = await getRevenueData();
         setRevenueData(revenueDataResponse);
         
-        // Fetch attendance analytics
         const attendanceAnalytics = await getAttendanceAnalytics();
-        setAttendanceData(attendanceAnalytics);
+        setAttendanceData({
+          student: {
+            overall: attendanceAnalytics?.student?.overall || { labels: [], present: [], absent: [], late: [] },
+            departmentWise: attendanceAnalytics?.student?.departmentWise || { labels: [], present: [], absent: [], late: [] }
+          },
+          faculty: {
+            overall: attendanceAnalytics?.faculty?.overall || { labels: [], present: [], absent: [], late: [] },
+            departmentWise: attendanceAnalytics?.faculty?.departmentWise || { labels: [], present: [], absent: [], late: [] }
+          }
+        });
       } catch (error) {
         console.error('Failed to fetch analytics data:', error);
       } finally {
@@ -60,9 +71,16 @@ export default function Analytics() {
   }, []);
   
   const handleExportCharts = () => {
-    // Logic to export charts as images or data to Excel/CSV
     alert('This would export the charts to Excel/CSV or as images.');
   };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -84,7 +102,6 @@ export default function Analytics() {
           </div>
         </div>
 
-        {/* View Type Tabs */}
         <div className="flex border-b border-gray-200">
           <button
             onClick={() => setActiveTab('students')}
@@ -108,21 +125,19 @@ export default function Analytics() {
           </button>
         </div>
 
-        {/* Student Analytics Section */}
         {activeTab === 'students' && (
           <div className="space-y-6">
-            {/* Department Distribution */}
             <div className="bg-white rounded-lg shadow p-6">
               <h2 className="text-lg font-medium text-gray-800 mb-4">Department-wise Student Distribution</h2>
               <div className="h-80">
                 <ChartComponent
                   type="bar"
                   data={{
-                    labels: departmentDistribution?.labels || ['Science', 'Arts', 'Commerce', 'Engineering', 'Medical'],
+                    labels: departmentDistribution.labels,
                     datasets: [
                       {
                         label: 'Number of Students',
-                        data: departmentDistribution?.data || [120, 85, 90, 110, 95],
+                        data: departmentDistribution.data,
                         backgroundColor: [
                           'rgba(54, 162, 235, 0.7)',
                           'rgba(255, 99, 132, 0.7)',
@@ -161,7 +176,6 @@ export default function Analytics() {
               </div>
             </div>
 
-            {/* Student Attendance */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="bg-white rounded-lg shadow p-6">
                 <h2 className="text-lg font-medium text-gray-800 mb-4">Student Attendance Trends</h2>
@@ -169,11 +183,11 @@ export default function Analytics() {
                   <ChartComponent
                     type="line"
                     data={{
-                      labels: attendanceData?.student?.overall?.labels || ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
+                      labels: attendanceData.student.overall.labels,
                       datasets: [
                         {
                           label: 'Present',
-                          data: attendanceData?.student?.overall?.present || [85, 82, 88, 90, 85],
+                          data: attendanceData.student.overall.present,
                           borderColor: 'rgba(16, 185, 129, 1)',
                           backgroundColor: 'rgba(16, 185, 129, 0.1)',
                           fill: true,
@@ -181,7 +195,7 @@ export default function Analytics() {
                         },
                         {
                           label: 'Absent',
-                          data: attendanceData?.student?.overall?.absent || [10, 12, 8, 5, 10],
+                          data: attendanceData.student.overall.absent,
                           borderColor: 'rgba(239, 68, 68, 1)',
                           backgroundColor: 'rgba(239, 68, 68, 0.1)',
                           fill: true,
@@ -189,7 +203,7 @@ export default function Analytics() {
                         },
                         {
                           label: 'Late',
-                          data: attendanceData?.student?.overall?.late || [5, 6, 4, 5, 5],
+                          data: attendanceData.student.overall.late,
                           borderColor: 'rgba(245, 158, 11, 1)',
                           backgroundColor: 'rgba(245, 158, 11, 0.1)',
                           fill: true,
@@ -247,21 +261,21 @@ export default function Analytics() {
                   <ChartComponent
                     type="bar"
                     data={{
-                      labels: attendanceData?.student?.departmentWise?.labels || ['Science', 'Arts', 'Commerce', 'Engineering', 'Medical'],
+                      labels: attendanceData.student.departmentWise.labels,
                       datasets: [
                         {
                           label: 'Present',
-                          data: attendanceData?.student?.departmentWise?.present || [88, 85, 82, 90, 87],
+                          data: attendanceData.student.departmentWise.present,
                           backgroundColor: 'rgba(16, 185, 129, 0.7)',
                         },
                         {
                           label: 'Absent',
-                          data: attendanceData?.student?.departmentWise?.absent || [8, 10, 12, 6, 9],
+                          data: attendanceData.student.departmentWise.absent,
                           backgroundColor: 'rgba(239, 68, 68, 0.7)',
                         },
                         {
                           label: 'Late',
-                          data: attendanceData?.student?.departmentWise?.late || [4, 5, 6, 4, 4],
+                          data: attendanceData.student.departmentWise.late,
                           backgroundColor: 'rgba(245, 158, 11, 0.7)',
                         },
                       ],
@@ -311,31 +325,12 @@ export default function Analytics() {
               </div>
             </div>
 
-            {/* Financial Data */}
             <div className="bg-white rounded-lg shadow p-6">
               <h2 className="text-lg font-medium text-gray-800 mb-4">Revenue Trends</h2>
               <div className="h-80">
                 <ChartComponent
                   type="line"
-                  data={revenueData || {
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                    datasets: [
-                      {
-                        label: 'Tuition Fees',
-                        data: [45000, 52000, 48000, 50000, 55000, 60000],
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        backgroundColor: 'rgba(75, 192, 192, 0.1)',
-                        tension: 0.4,
-                      },
-                      {
-                        label: 'Other Income',
-                        data: [12000, 15000, 18000, 14000, 20000, 16000],
-                        borderColor: 'rgba(153, 102, 255, 1)',
-                        backgroundColor: 'rgba(153, 102, 255, 0.1)',
-                        tension: 0.4,
-                      }
-                    ]
-                  }}
+                  data={revenueData}
                   options={{
                     scales: {
                       y: {
@@ -381,40 +376,14 @@ export default function Analytics() {
           </div>
         )}
 
-        {/* Faculty Analytics Section */}
         {activeTab === 'faculty' && (
           <div className="space-y-6">
-            {/* Faculty Performance */}
             <div className="bg-white rounded-lg shadow p-6">
               <h2 className="text-lg font-medium text-gray-800 mb-4">Faculty Performance Metrics</h2>
               <div className="h-80">
                 <ChartComponent
                   type="radar"
-                  data={facultyPerformance || {
-                    labels: ['Teaching Quality', 'Student Feedback', 'Research', 'Punctuality', 'Mentorship'],
-                    datasets: [
-                      {
-                        label: 'Department Average',
-                        data: [4.2, 3.8, 3.5, 4.5, 4.0],
-                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                        borderColor: 'rgba(54, 162, 235, 1)',
-                        pointBackgroundColor: 'rgba(54, 162, 235, 1)',
-                        pointBorderColor: '#fff',
-                        pointHoverBackgroundColor: '#fff',
-                        pointHoverBorderColor: 'rgba(54, 162, 235, 1)',
-                      },
-                      {
-                        label: 'Institution Average',
-                        data: [3.8, 3.9, 3.7, 4.2, 3.8],
-                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                        borderColor: 'rgba(255, 99, 132, 1)',
-                        pointBackgroundColor: 'rgba(255, 99, 132, 1)',
-                        pointBorderColor: '#fff',
-                        pointHoverBackgroundColor: '#fff',
-                        pointHoverBorderColor: 'rgba(255, 99, 132, 1)',
-                      }
-                    ]
-                  }}
+                  data={facultyPerformance}
                   options={{
                     scales: {
                       r: {
@@ -447,7 +416,6 @@ export default function Analytics() {
               </div>
             </div>
 
-            {/* Faculty Attendance */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="bg-white rounded-lg shadow p-6">
                 <h2 className="text-lg font-medium text-gray-800 mb-4">Faculty Attendance Trends</h2>
@@ -455,11 +423,11 @@ export default function Analytics() {
                   <ChartComponent
                     type="line"
                     data={{
-                      labels: attendanceData?.faculty?.overall?.labels || ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
+                      labels: attendanceData.faculty.overall.labels,
                       datasets: [
                         {
                           label: 'Present',
-                          data: attendanceData?.faculty?.overall?.present || [92, 90, 94, 95, 93],
+                          data: attendanceData.faculty.overall.present,
                           borderColor: 'rgba(16, 185, 129, 1)',
                           backgroundColor: 'rgba(16, 185, 129, 0.1)',
                           fill: true,
@@ -467,7 +435,7 @@ export default function Analytics() {
                         },
                         {
                           label: 'Absent',
-                          data: attendanceData?.faculty?.overall?.absent || [5, 7, 4, 3, 5],
+                          data: attendanceData.faculty.overall.absent,
                           borderColor: 'rgba(239, 68, 68, 1)',
                           backgroundColor: 'rgba(239, 68, 68, 0.1)',
                           fill: true,
@@ -475,7 +443,7 @@ export default function Analytics() {
                         },
                         {
                           label: 'Late',
-                          data: attendanceData?.faculty?.overall?.late || [3, 3, 2, 2, 2],
+                          data: attendanceData.faculty.overall.late,
                           borderColor: 'rgba(245, 158, 11, 1)',
                           backgroundColor: 'rgba(245, 158, 11, 0.1)',
                           fill: true,
@@ -597,7 +565,6 @@ export default function Analytics() {
               </div>
             </div>
 
-            {/* Classes Taught Distribution */}
             <div className="bg-white rounded-lg shadow p-6">
               <h2 className="text-lg font-medium text-gray-800 mb-4">Classes Taught Per Department</h2>
               <div className="h-80">
@@ -607,7 +574,7 @@ export default function Analytics() {
                     labels: departmentDistribution.labels,
                     datasets: [
                       {
-                        data: [15, 12, 8, 10, 7], // Example data for classes taught
+                        data: [15, 12, 8, 10, 7],
                         backgroundColor: [
                           'rgba(54, 162, 235, 0.7)',
                           'rgba(255, 99, 132, 0.7)',
