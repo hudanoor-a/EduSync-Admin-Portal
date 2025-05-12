@@ -4,6 +4,13 @@ import { FiCalendar, FiDownload, FiCheck, FiX, FiClock } from 'react-icons/fi';
 import FilterBar from '../../components/FilterBar';
 import DataTable from '../../components/DataTable';
 import AttendanceChart from '../../components/AttendanceChart';
+import dynamic from 'next/dynamic';
+
+// Dynamic import with no server-side rendering for Chart.js component
+const ChartComponent = dynamic(
+  () => import('../../components/ChartComponent'),
+  { ssr: false }
+);
 import { 
   getAttendance, 
   getAttendanceAnalytics, 

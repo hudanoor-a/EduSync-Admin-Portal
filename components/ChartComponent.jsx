@@ -1,13 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import Chart from 'chart.js/auto';
 
-export default function ChartComponent({
-  type = 'bar',
-  data,
-  options = {},
-  height = 300,
-  width = '100%',
-}) {
+const ChartComponent = ({ type, data, options = {} }) => {
   const chartRef = useRef(null);
   const chartInstance = useRef(null);
 
@@ -31,7 +25,7 @@ export default function ChartComponent({
       });
     }
 
-    // Clean up chart on component unmount
+    // Cleanup on unmount
     return () => {
       if (chartInstance.current) {
         chartInstance.current.destroy();
@@ -39,9 +33,7 @@ export default function ChartComponent({
     };
   }, [type, data, options]);
 
-  return (
-    <div style={{ height, width }}>
-      <canvas ref={chartRef} />
-    </div>
-  );
-}
+  return <canvas ref={chartRef} />;
+};
+
+export default ChartComponent;

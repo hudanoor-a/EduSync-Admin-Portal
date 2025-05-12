@@ -9,7 +9,7 @@ import {
   getClasses, 
   getSections, 
   getCourses, 
-  getFaculty, 
+  getUsers, 
   approveLeave, 
   rejectLeave 
 } from '../../utils/adminApi';
@@ -48,7 +48,7 @@ export default function Leaves() {
         const coursesData = await getCourses();
         setCourses(coursesData);
         
-        const facultyData = await getFaculty();
+        const facultyData = await getUsers({role: 'faculty'});
         setFaculty(facultyData);
         
         // Fetch leave requests

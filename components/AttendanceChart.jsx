@@ -1,93 +1,84 @@
 import React from 'react';
-import ChartComponent from './ChartComponent';
+import dynamic from 'next/dynamic';
 
-export default function AttendanceChart({ data, type = 'student' }) {
-  // Prepare data for chart
-  const chartData = {
-    labels: data.labels || ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-    datasets: [
-      {
-        label: 'Present',
-        data: data.present || [65, 70, 80, 81, 90, 85],
-        backgroundColor: '#10B981',
-        borderColor: '#10B981',
-        borderWidth: 1,
-      },
-      {
-        label: 'Absent',
-        data: data.absent || [25, 20, 15, 10, 5, 10],
-        backgroundColor: '#EF4444',
-        borderColor: '#EF4444',
-        borderWidth: 1,
-      },
-      {
-        label: 'Late',
-        data: data.late || [10, 10, 5, 9, 5, 5],
-        backgroundColor: '#F59E0B',
-        borderColor: '#F59E0B',
-        borderWidth: 1,
-      },
-    ],
+// Dynamic import with no SSR for Chart.js component
+const ChartComponent = dynamic(
+  () => import('./ChartComponent'),
+  { ssr: false }
+);
+
+const AttendanceChart = ({ data = {}, type = 'student' }) => {
+  // Default data if none provided
+  const defaultData = {
+    labels: ['Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+    present: [85, 82, 88, 90, 85],
+    absent: [10, 12, 8, 5, 10],
+    late: [5, 6, 4, 5, 5],
   };
 
-  const options = {
-    plugins: {
-      title: {
-        display: true,
-        text: type === 'student' ? 'Student Attendance Trends' : 'Faculty Attendance Report',
-        font: { size: 16 },
-      },
-      legend: {
-        position: 'bottom',
-      },
-      tooltip: {
-        callbacks: {
-          label: function(context) {
-            let label = context.dataset.label || '';
-            if (label) {
-              label += ': ';
-            }
-            if (context.parsed.y !== null) {
-              label += context.parsed.y + '%';
-            }
-            return label;
-          }
-        }
-      }
-    },
-    scales: {
-      x: {
-        title: {
-          display: true,
-          text: 'Month',
-        },
-      },
-      y: {
-        title: {
-          display: true,
-          text: 'Percentage',
-        },
-        min: 0,
-        max: 100,
-        ticks: {
-          callback: function(value) {
-            return value + '%';
-          }
-        }
-      },
-    },
-    responsive: true,
-    maintainAspectRatio: false,
+  // Use provided data or fallback to default
+  const chartData = {
+    labels: data.labels || defaultData.labels,
+    present: data.present || defaultData.present,
+    absent: data.absent || defaultData.absent,
+    late: data.late || defaultData.late,
   };
 
   return (
     <div className="w-full h-80 p-4 bg-white rounded-lg shadow">
       <ChartComponent
-        type="bar"
-        data={chartData}
-        options={options}
-        height={300}
+        type="line"
+        data={{
+          labels: chartData.labels,
+          datasets: [
+            {
+              label: 'Present',
+              data: chartData.present,
+              borderColor: '#10B981',
+              backgroundColor: 'rgba(16, 185, 129, 0.1)',
+              tension: 0.3,
+            },
+            {
+              label: 'Absent',
+              data: chartData.absent,
+              borderColor: '#EF4444',
+              backgroundColor: 'rgba(239, 68, 68, 0.1)',
+              tension: 0.3,
+            },
+            {
+              label: 'Late',
+              data: chartData.late,
+              borderColor: '#F59E0B',
+              backgroundColor: 'rgba(245, 158, 11, 0.1)',
+              tension: 0.3,
+            },
+          ],
+        }}
+        options={{
+          plugins: {
+            title: {
+              display: true,
+              text: `${type === 'student' ? 'Student' : 'Faculty'} Attendance Trend`,
+              font: { size: 16 },
+            },
+            legend: {
+              position: 'bottom',
+            },
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 100,
+              title: {
+                display: true,
+                text: 'Percentage',
+              },
+            },
+          },
+        }}
       />
     </div>
   );
-}
+};
+
+export default AttendanceChart;
