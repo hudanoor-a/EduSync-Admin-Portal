@@ -198,23 +198,34 @@ export default function Timetable() {
           key: 'departmentId', 
           label: 'Department', 
           type: 'select', 
+          placeholder: 'Select Department',
           options: departments.map(dept => ({ value: dept.id, label: dept.name }))
         },
         { 
           key: 'classId', 
           label: 'Class', 
           type: 'select', 
-          options: classes
-            .filter(cls => !filters.departmentId || cls.departmentId.toString() === filters.departmentId)
-            .map(cls => ({ value: cls.id, label: cls.name }))
+          placeholder: 'Select Class',
+          dependsOn: 'departmentId',
+          getOptionsFrom: (selectedFilters) => {
+            return classes
+              .filter(cls => !selectedFilters.departmentId || 
+                cls.departmentId?.toString() === selectedFilters.departmentId.toString())
+              .map(cls => ({ value: cls.id, label: cls.name }));
+          }
         },
         { 
           key: 'sectionId', 
           label: 'Section', 
           type: 'select', 
-          options: sections
-            .filter(sec => !filters.classId || sec.classId.toString() === filters.classId)
-            .map(sec => ({ value: sec.id, label: sec.name }))
+          placeholder: 'Select Section',
+          dependsOn: 'classId',
+          getOptionsFrom: (selectedFilters) => {
+            return sections
+              .filter(sec => !selectedFilters.classId || 
+                sec.classId?.toString() === selectedFilters.classId.toString())
+              .map(sec => ({ value: sec.id, label: sec.name }));
+          }
         },
         { 
           key: 'day', 
@@ -229,12 +240,14 @@ export default function Timetable() {
           key: 'facultyId', 
           label: 'Faculty', 
           type: 'select', 
+          placeholder: 'Select Faculty',
           options: faculty.map(f => ({ value: f.id, label: f.name }))
         },
         { 
           key: 'departmentId', 
           label: 'Department', 
           type: 'select', 
+          placeholder: 'Select Department',
           options: departments.map(dept => ({ value: dept.id, label: dept.name }))
         },
         { 
@@ -407,6 +420,11 @@ export default function Timetable() {
           filters={getFilterOptions()}
           activeFilters={filters}
           onFilterChange={handleFilterChange}
+          loading={loading}
+          dependencies={{
+            classId: ['departmentId'],
+            sectionId: ['classId']
+          }}
         />
 
         {/* Day Navigation */}
