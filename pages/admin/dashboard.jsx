@@ -1,7 +1,12 @@
 import { useState, useEffect } from 'react';
 import Layout from '../../components/Layout';
 import { FiUsers, FiBookOpen, FiCalendar, FiDollarSign } from 'react-icons/fi';
+import dynamic from 'next/dynamic';
 import { getAllAnalytics } from '../../utils/adminApi';
+
+// Dynamic import for chart components
+const ChartComponent = dynamic(() => import('../../components/ChartComponent'), { ssr: false });
+const AttendanceChart = dynamic(() => import('../../components/AttendanceChart'), { ssr: false });
 
 export default function Dashboard() {
   const [loading, setLoading] = useState(true);
@@ -286,22 +291,102 @@ export default function Dashboard() {
           </div>
           
           {/* Analytics section */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Performance graph */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-lg font-semibold text-gray-800 mb-4">Performance</h2>
-              <div className="h-64 flex items-center justify-center bg-gray-50 rounded">
-                <p className="text-gray-500">Performance chart will be displayed here</p>
-                {/* Chart.js or other charting library would be used here */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Attendance Trends */}
+            <div className="lg:col-span-1 bg-white rounded-lg shadow p-6">
+              <h2 className="text-lg font-semibold text-gray-800 mb-4">Attendance Trends</h2>
+              <AttendanceChart 
+                data={stats.attendanceAnalytics?.student?.overall || {}} 
+                type="student"
+              />
+            </div>
+            
+            {/* Faculty Performance graph */}
+            <div className="lg:col-span-1 bg-white rounded-lg shadow p-6">
+              <h2 className="text-lg font-semibold text-gray-800 mb-4">Faculty Performance</h2>
+              <div className="h-64">
+                <ChartComponent
+                  type="radar"
+                  data={stats.facultyPerformance || {
+                    labels: ['Teaching Quality', 'Student Feedback', 'Research', 'Punctuality', 'Mentorship'],
+                    datasets: [
+                      {
+                        label: 'Department Average',
+                        data: [4.2, 3.8, 3.5, 4.5, 4.0],
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        pointBackgroundColor: 'rgba(54, 162, 235, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(54, 162, 235, 1)',
+                      },
+                      {
+                        label: 'Institution Average',
+                        data: [3.8, 3.9, 3.7, 4.2, 3.8],
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        pointBackgroundColor: 'rgba(255, 99, 132, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(255, 99, 132, 1)',
+                      }
+                    ]
+                  }}
+                  options={{
+                    scales: {
+                      r: {
+                        beginAtZero: true,
+                        max: 5,
+                        ticks: {
+                          stepSize: 1
+                        }
+                      }
+                    }
+                  }}
+                />
               </div>
             </div>
             
             {/* Department distribution */}
-            <div className="bg-white rounded-lg shadow p-6">
+            <div className="lg:col-span-1 bg-white rounded-lg shadow p-6">
               <h2 className="text-lg font-semibold text-gray-800 mb-4">Department Distribution</h2>
-              <div className="h-64 flex items-center justify-center bg-gray-50 rounded">
-                <p className="text-gray-500">Department distribution chart will be displayed here</p>
-                {/* Chart.js or other charting library would be used here */}
+              <div className="h-64">
+                <ChartComponent
+                  type="bar"
+                  data={{
+                    labels: stats.departmentDistribution?.labels || ['Science', 'Arts', 'Commerce', 'Engineering', 'Medical'],
+                    datasets: [
+                      {
+                        label: 'Number of Students',
+                        data: stats.departmentDistribution?.data || [120, 85, 90, 110, 95],
+                        backgroundColor: [
+                          'rgba(54, 162, 235, 0.7)',
+                          'rgba(255, 99, 132, 0.7)',
+                          'rgba(255, 206, 86, 0.7)',
+                          'rgba(75, 192, 192, 0.7)',
+                          'rgba(153, 102, 255, 0.7)',
+                        ],
+                        borderWidth: 1,
+                      },
+                    ],
+                  }}
+                  options={{
+                    plugins: {
+                      legend: {
+                        display: false,
+                      },
+                    },
+                    scales: {
+                      y: {
+                        beginAtZero: true,
+                        title: {
+                          display: true,
+                          text: 'Number of Students',
+                        },
+                      },
+                    },
+                  }}
+                />
               </div>
             </div>
           </div>
