@@ -17,7 +17,7 @@ export default function Header({ toggleSidebar, title = "Dashboard" }) {
   };
 
   return (
-    <header className="sticky top-0 z-10 flex-shrink-0 flex h-16 bg-gray-50 shadow-sm">
+    <header className="sticky top-0 z-10 flex-shrink-0 flex h-16 bg-white shadow-sm">
       <button
         type="button"
         className="px-4 text-gray-500 focus:outline-none focus:text-gray-600 md:hidden"

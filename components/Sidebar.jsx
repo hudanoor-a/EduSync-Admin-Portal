@@ -75,9 +75,9 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
         />
       )}
 
-      {/* Sidebar - updated to match UI */}
+      {/* Sidebar - fixed position, dark blue background from UI */}
       <div 
-        className={`${isOpen ? 'translate-x-0' : '-translate-x-full'} fixed inset-y-0 left-0 z-40 w-64 bg-[#2a3554] text-white transition-transform duration-300 ease-in-out md:translate-x-0 md:static md:inset-auto md:z-auto`}
+        className={`${isOpen ? 'translate-x-0' : '-translate-x-full'} fixed inset-y-0 left-0 z-40 w-64 bg-[#1e2c4f] text-white transition-transform duration-300 ease-in-out md:translate-x-0 md:relative md:inset-auto md:z-auto`}
       >
         {/* Sidebar header */}
         <div className="h-16 flex items-center justify-between px-6 border-b border-gray-700">
@@ -113,9 +113,9 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
                   href={item.href}
                   className={`${
                     isActive
-                      ? 'bg-[#3d476e] text-white'
-                      : 'text-gray-300 hover:bg-[#3d476e] hover:text-white'
-                  } group flex items-center px-4 py-3 text-base font-medium rounded-md transition-colors duration-200`}
+                      ? 'text-white bg-opacity-20 bg-white'
+                      : 'text-gray-300 hover:bg-white hover:bg-opacity-10 hover:text-white'
+                  } group flex items-center px-4 py-3 text-base font-medium transition-colors duration-200`}
                 >
                   <item.icon
                     className="mr-3 flex-shrink-0 h-5 w-5"

@@ -2,25 +2,29 @@ import { useState, useEffect } from 'react';
 
 export default function FilterBar({ 
   filters = [],
+  activeFilters = {},
   onFilterChange,
   className = ''
 }) {
-  const [selectedFilters, setSelectedFilters] = useState({});
+  const [selectedFilters, setSelectedFilters] = useState(activeFilters);
 
   // Initialize selected filters
   useEffect(() => {
-    const initialFilters = {};
+    const initialFilters = {...activeFilters};
     filters.forEach(filter => {
-      initialFilters[filter.name] = filter.defaultValue || '';
+      // Only set if not already in activeFilters
+      if (!(filter.key in initialFilters)) {
+        initialFilters[filter.key] = filter.defaultValue || '';
+      }
     });
     setSelectedFilters(initialFilters);
-  }, [filters]);
+  }, [filters, activeFilters]);
 
   // Handle filter change
-  const handleFilterChange = (filterName, value) => {
+  const handleFilterChange = (filterKey, value) => {
     const newFilters = {
       ...selectedFilters,
-      [filterName]: value
+      [filterKey]: value
     };
     setSelectedFilters(newFilters);
     if (onFilterChange) {
@@ -32,7 +36,7 @@ export default function FilterBar({
   const resetFilters = () => {
     const resetValues = {};
     filters.forEach(filter => {
-      resetValues[filter.name] = filter.defaultValue || '';
+      resetValues[filter.key] = filter.defaultValue || '';
     });
     setSelectedFilters(resetValues);
     if (onFilterChange) {
