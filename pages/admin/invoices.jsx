@@ -11,7 +11,7 @@ import {
 import FilterBar from '../../components/FilterBar';
 import DataTable from '../../components/DataTable';
 import InvoiceForm from '../../components/InvoiceForm';
-import { getInvoices, getStudents, createInvoice, updateInvoice, deleteInvoice, markInvoicePaid } from '../../utils/adminApi';
+import { getInvoices, getUsers, createInvoice, updateInvoice, deleteInvoice, markInvoicePaid } from '../../utils/adminApi';
 
 export default function Invoices() {
   const [invoices, setInvoices] = useState([]);
@@ -32,7 +32,7 @@ export default function Invoices() {
         setLoading(true);
         
         // Fetch students for filters and form
-        const studentsData = await getStudents();
+        const studentsData = await getUsers({role: 'student'});
         setStudents(studentsData);
         
         // Fetch invoices

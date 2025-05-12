@@ -141,6 +141,11 @@ export default function Events() {
       key: 'audience_type', 
       label: 'Audience',
       render: (row) => {
+        // Check if audience_type exists to prevent errors
+        if (!row.audience_type) {
+          return 'All Users';
+        }
+        
         const audienceType = row.audience_type.charAt(0).toUpperCase() + row.audience_type.slice(1);
         
         if (row.audience_type === 'all') {

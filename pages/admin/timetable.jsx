@@ -9,7 +9,7 @@ import {
   getClasses, 
   getSections, 
   getCourses, 
-  getFaculty, 
+  getUsers, 
   createSchedule, 
   updateSchedule, 
   deleteSchedule 
@@ -64,7 +64,7 @@ export default function Timetable() {
         const coursesData = await getCourses();
         setCourses(coursesData);
         
-        const facultyData = await getFaculty();
+        const facultyData = await getUsers({role: 'faculty'});
         setFaculty(facultyData);
         
         // Fetch schedules based on filters
